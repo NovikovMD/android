@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="marginStart">8dp</dimen>
+    <dimen name="marginEnd">8dp</dimen>
+    <dimen name="marginBottom">12dp</dimen>
+    <dimen name="layout_marginEnd">8dp</dimen>
+    <dimen name="layout_marginTop">8dp</dimen>
+    <dimen name="layout_marginStart">8dp</dimen>
+    <dimen name="TextView_textSize">34sp</dimen>
+</resources>

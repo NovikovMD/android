@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Голосовой помощник</string>
+    <string name="botsAnswer">Я глупенький, не знаю ответ(</string>
+    <string name="buttonText">Отправить</string>
+    <string name="editTextHint">Задайте вопрос</string>
+    <string name="hiAnswer">Привет</string>
+    <string name="byeAnswer">До новых встреч</string>
+    <string name="howAnswer">Не плохо</string>
+    <string name="whatAnswer">Отвечаю на вопросы</string>
+</resources>

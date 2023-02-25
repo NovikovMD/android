@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VoiceAssistant</string>
+    <string name="botsAnswer">\nI got it. Processing…\n</string>
+    <string name="buttonText">Send</string>
+    <string name="editTextHint">Ask a question</string>
+</resources>
