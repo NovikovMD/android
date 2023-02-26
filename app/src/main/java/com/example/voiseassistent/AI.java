@@ -2,6 +2,7 @@ package com.example.voiseassistent;
 
 import android.content.Context;
 
+import com.example.voiseassistent.forecast.ForecastService;
 import com.example.voiseassistent.forecast.ForecastToString;
 
 import org.joda.time.DateTime;
@@ -10,6 +11,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -24,35 +26,42 @@ public class AI {
                 context.getString(R.string.hiAnswer)));
         map.put("пока", s -> callback.accept(
                 context.getString(R.string.byeAnswer)));
-        map.put("до свидания",s-> callback.accept(
+        map.put("до свидания", s -> callback.accept(
                 context.getString(R.string.byeAnswer)));
-        map.put("как дела",s-> callback.accept(
+        map.put("как дела", s -> callback.accept(
                 context.getString(R.string.howAnswer)));
-        map.put("как настроение",s-> callback.accept(
+        map.put("как настроение", s -> callback.accept(
                 context.getString(R.string.howAnswer)));
-        map.put("чем занимаешься",s-> callback.accept(
+        map.put("чем занимаешься", s -> callback.accept(
                 context.getString(R.string.whatAnswer)));
-        map.put("что делаешь",s-> callback.accept(
+        map.put("что делаешь", s -> callback.accept(
                 context.getString(R.string.whatAnswer)));
 
-        map.put("какой сегодня день",s-> callback.accept(
+        map.put("какой сегодня день", s -> callback.accept(
                 getTodayDay()));
-        map.put("какое сегодня число",s-> callback.accept(
+        map.put("какое сегодня число", s -> callback.accept(
                 getTodayDay()));
-        map.put("сколько времени",s-> callback.accept(
+        map.put("сколько времени", s -> callback.accept(
                 getTodayTime()));
-        map.put("который час",s-> callback.accept(
+        map.put("который час", s -> callback.accept(
                 getTodayTime()));
-        map.put("какой сегодня день недели",s-> callback.accept(
+        map.put("какой сегодня день недели", s -> callback.accept(
                 getTodayDayOfAWeek()));
-        map.put("сколько дней до 23 февраля",s-> callback.accept(
+        map.put("сколько дней до 23 февраля", s -> callback.accept(
                 getHowMachDayTo()));
 
         map.put("погода", s -> getWeather(s, callback));
-        map.put("скажи", s ->  getNumber(s, callback));
+        map.put("скажи", s -> getNumber(s, callback));
+        map.put("что будет", s -> getHoliday(s, callback));
     }
 
-    private static void getNumber(String question, Consumer<String> callback) {
+    private static void getHoliday(final String question, final Consumer<String> callback) {
+        ForecastToString.getHoliday(
+                question.substring(question.lastIndexOf(' ') + 1),
+                callback);
+    }
+
+    private static void getNumber(final String question, final Consumer<String> callback) {
         Matcher matcher = Pattern.compile("скажи (\\p{N}+)", Pattern.CASE_INSENSITIVE)
                 .matcher(question);
         if (matcher.find()) {
@@ -85,12 +94,12 @@ public class AI {
     }
 
     private static String getHowMachDayTo() {
-        DateTime end = new DateTime
+        final DateTime end = new DateTime
                 (2023,
                         2,
                         23,
                         0, 0, 0);
-        DateTime start = new DateTime
+        final DateTime start = new DateTime
                 (LocalDate.now().year().get(),
                         LocalDate.now().monthOfYear().get(),
                         LocalDate.now().dayOfMonth().get(),
@@ -104,9 +113,10 @@ public class AI {
         if (map.size() == 0) {
             buildInstance(context, callback);
         }
+        final String normalizedQuestion = question.toLowerCase().trim();
 
         for (Map.Entry<String, Consumer<String>> entry : map.entrySet()) {
-            if (question.toLowerCase().trim().contains(
+            if (normalizedQuestion.contains(
                     entry.getKey())) {
                 entry.getValue().accept(question.toLowerCase().trim());
                 return;

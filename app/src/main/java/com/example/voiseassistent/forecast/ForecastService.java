@@ -1,7 +1,10 @@
 package com.example.voiseassistent.forecast;
 
+import com.example.voiseassistent.forecast.parsing.PageAdapter;
 import com.google.gson.GsonBuilder;
 
+
+import okhttp3.HttpUrl;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -13,7 +16,8 @@ public class ForecastService {
                         GsonConverterFactory.create(new GsonBuilder()
                                 .setLenient()
                                 .create()))
-                .build().create(ForecastApi.class);
+                .build()
+                .create(ForecastApi.class);
     }
 
     public static ForecastApi getNumbersApi() {
@@ -23,7 +27,15 @@ public class ForecastService {
                         GsonConverterFactory.create(new GsonBuilder()
                                 .setLenient()
                                 .create()))
-                .build().create(ForecastApi.class);
+                .build().
+                create(ForecastApi.class);
     }
 
+    public static ForecastApi getHoliday() {
+        return new Retrofit.Builder()
+                .baseUrl(HttpUrl.parse("https://mirkosmosa.ru/holiday/2023/"))
+                .addConverterFactory(PageAdapter.FACTORY)
+                .build()
+                .create(ForecastApi.class);
+    }
 }
