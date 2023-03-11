@@ -23,7 +23,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     }
     public void bind(Message message) {
         messageText.setText(message.text);
-        DateFormat fmt = new SimpleDateFormat("mm:hh dd.MM.yy", Locale.GERMAN);
+        DateFormat fmt = new SimpleDateFormat("hh:mm dd.MM.yy", Locale.GERMAN);
         messageDate.setText(fmt.format(message.date));
     }
 

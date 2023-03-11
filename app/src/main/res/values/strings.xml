@@ -7,4 +7,6 @@
     <string name="byeAnswer">До новых встреч</string>
     <string name="howAnswer">Не плохо</string>
     <string name="whatAnswer">Отвечаю на вопросы</string>
+    <string name="day_title">Дневная тема</string>
+    <string name="night_title">Ночная тема</string>
 </resources>

@@ -84,7 +84,7 @@ public class ForecastToString {
     }
 
     private static String normalizeNumber(String numb) {
-        return numb.replace("рубля 00 копеек","");
+        return numb.substring(0,numb.indexOf("руб"));
     }
 
     public static void getHoliday(final String date,final Consumer<String> callback) {

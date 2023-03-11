@@ -10,11 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.voiseassistent.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public final List<Message> messageList = new ArrayList<>();
-    private static final int ASSISTANT_TYPE=0;//сделать enum
+    public ArrayList<Message> messageList = new ArrayList<>();
+    private static final int ASSISTANT_TYPE=0;
     private static final int USER_TYPE=1;
 
     @NonNull

@@ -14,13 +14,11 @@ public class Parser {
 
     public static String getHoliday(final String date, final Document content) throws IOException {
         final Elements list = content.body()
-                .getElementsByAttributeValue("class", "holiday_calend")
+                .getElementsByAttributeValue("id", "holiday_calend")
                 .first()
                 .children();
 
-        selectMonth(date, list);
-
-        return WRONG_DATE;
+        return selectMonth(date, list);
     }
 
 
@@ -30,7 +28,23 @@ public class Parser {
                     .first()
                     .text()
                     .contains(normalizeMonth(date).substring(0, 4))) {
-                selectDay(date, monthSelect);
+                return selectDay(date, monthSelect);
+            }
+        }
+        return WRONG_DATE;
+    }
+
+    private static String selectDay(final String date, final Element monthSelect) {
+        final String normalizedDate = date.substring(0, date.indexOf('.')) + normalizeMonth(date);
+
+        for (final Element daySelect : monthSelect.children()
+                .get(1)
+                .children()) {
+            if (daySelect.getElementsByTag("span")
+                    .first()
+                    .text()
+                    .contains(normalizedDate)) {
+                return getOutput(daySelect);
             }
         }
         return WRONG_DATE;
@@ -66,20 +80,6 @@ public class Parser {
             default:
                 return "бе-бе";
         }
-    }
-
-    private static String selectDay(final String date, final Element monthSelect) {
-        final String normalizedDate = date.substring(0, date.indexOf('.')) + normalizeMonth(date);
-
-        for (final Element daySelect : monthSelect.getElementsByAttributeValue("class", "holiday_month").first().children()) {
-            if (daySelect.getElementsByTag("span")
-                    .first()
-                    .text()
-                    .contains(normalizedDate)) {
-                return getOutput(daySelect);
-            }
-        }
-        return WRONG_DATE;
     }
 
     private static String getOutput(Element daySelect) {

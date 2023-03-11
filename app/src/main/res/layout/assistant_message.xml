@@ -13,7 +13,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/photo_2022_11_18_12_49_44" />
+        android:src="@drawable/common_google_signin_btn_icon_dark" />
 
     <TextView
         android:id="@+id/messageTextView"
