@@ -7,16 +7,20 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.voiseassistent.output.Message;
+import com.example.voiseassistent.beans.entity.MessageEntity;
+import com.example.voiseassistent.db.DBHelper;
+import com.example.voiseassistent.beans.Message;
 import com.example.voiseassistent.output.MessageListAdapter;
 
 import java.util.ArrayList;
@@ -33,20 +37,46 @@ public class MainActivity extends AppCompatActivity {
     private boolean isLight = true;
     private String THEME = "THEME";
 
+    private DBHelper dBHelper;
+    private SQLiteDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sPref = getSharedPreferences(APP_PREFERENCES,MODE_PRIVATE);
+        messageListAdapter = new MessageListAdapter();
+
+        dBHelper = new DBHelper(this);
+        database = dBHelper.getWritableDatabase();
+
+        if (savedInstanceState == null) {
+            Cursor cursor = database.query(DBHelper.TABLE_MESSAGES,
+                    null, null, null, null,
+                    null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    int messageIndex = cursor.getColumnIndex(DBHelper.FIELD_MESSAGE);
+                    int dateIndex = cursor.getColumnIndex(DBHelper.FIELD_DATE);
+                    int sendIndex = cursor.getColumnIndex(DBHelper.FIELD_SEND);
+
+                    MessageEntity entity = new MessageEntity(cursor.getString(messageIndex),
+                            cursor.getString(dateIndex), cursor.getInt(sendIndex));
+                    Message message = new Message(entity);
+                    messageListAdapter.messageList.add(message);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        }
+
+        sPref = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         isLight = sPref.getBoolean(THEME, true);
         if (!isLight) {
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
         setContentView(R.layout.activity_main);
 
-        sendButton = findViewById(R.id.button);
+        sendButton = findViewById(R.id.buttonSend);
         questionText = findViewById(R.id.questionField);
         chatMessageList = findViewById(R.id.chatMessageList);
-        messageListAdapter = new MessageListAdapter();
 
         chatMessageList.setLayoutManager(new LinearLayoutManager(this));
         chatMessageList.setAdapter(messageListAdapter);
@@ -57,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         sendButton.setOnClickListener(view -> onSend());
+    }
+
+    @Override
+    protected void onDestroy() {
+        database.close();
+        dBHelper.close();
+        super.onDestroy();
     }
 
     @Override
@@ -88,20 +125,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         SharedPreferences.Editor editor = sPref.edit();
         editor.putBoolean(THEME, isLight);
+        editor.apply();
+
+        database.delete(DBHelper.TABLE_MESSAGES, null, null);
+        for (Message message : messageListAdapter.messageList) {
+            MessageEntity entity = new MessageEntity(message);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DBHelper.FIELD_MESSAGE, entity.text);
+            contentValues.put(DBHelper.FIELD_SEND, entity.isSend);
+            contentValues.put(DBHelper.FIELD_DATE, entity.date);
+            database.insert(DBHelper.TABLE_MESSAGES, null, contentValues);
+        }
+
         super.onStop();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable("Chat",messageListAdapter.messageList);
+        outState.putSerializable("Chat", messageListAdapter.messageList);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onRestoreInstanceState(@Nullable Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        messageListAdapter.messageList = (ArrayList<Message>)
-                savedInstanceState.getSerializable("Chat");
+        messageListAdapter.messageList =
+                (ArrayList<Message>) savedInstanceState.getSerializable("Chat");
     }
 
     protected void onSend() {

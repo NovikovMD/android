@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.voiseassistent.R;
+import com.example.voiseassistent.beans.Message;
 
 import java.util.ArrayList;
 
